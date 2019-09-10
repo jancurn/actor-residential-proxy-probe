@@ -86,7 +86,7 @@ const handleSession = async (input, sessionKey, oldSessionInfo) => {
 
     // No postal code?
     if (!sessionInfo.postalCode) {
-        console.log(`Session ${sessionKey}: Missing postal code`);
+        console.log(`Session ${sessionKey}: Missing postal code ${JSON.stringify(_.pick(sessionInfo, 'ipAddress', 'regionName', 'city', 'postalCode'))}`);
         delete state.proxySessions[sessionKey];
         statsInc('missingPostalCode');
         return;
@@ -158,7 +158,7 @@ const heartbeat = ({ input, keyValueStore }) => {
     for (let region of regions) {
         const count = regionToProxyCount[region] || 0;
         minPerRegion = Math.min(count, minPerRegion);
-        maxPerRegion = Math.min(count, maxPerRegion);
+        maxPerRegion = Math.max(count, maxPerRegion);
     }
     if (minPerRegion === Number.POSITIVE_INFINITY) minPerRegion = 0;
     if (maxPerRegion === Number.NEGATIVE_INFINITY) maxPerRegion = 0;
