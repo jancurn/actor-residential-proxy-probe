@@ -6,7 +6,7 @@ const usZipCodeToDma = require('./us_zip_code_to_dma');
 
 const { log } = Apify.utils;
 
-const HEARTBEAT_INTERVAL_MILLIS = 15 * 1000;
+const HEARTBEAT_INTERVAL_MILLIS = 20 * 1000;
 const MAX_SESSION_AGE_MILLIS = 45 * 1000;
 const NEW_SESSIONS_PER_HEARTBEAT = 30;
 
