@@ -46,7 +46,6 @@ const probeSession = async (sessionKey, countryCode) => {
     const { geo } = json.data;
 
     return {
-        sessionKey,
         ipAddress: geo.ip,
         countryCode: geo.country_code,
         regionName: geo.region_name,
