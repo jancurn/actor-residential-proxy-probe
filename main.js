@@ -44,6 +44,7 @@ const probeSession = async (sessionKey, countryCode) => {
     await randomSleep();
 
     const opts = {
+        // NOTE: Using HTTP instead of HTTPS because it consumes less residential traffic!
         url: 'http://tools.keycdn.com/geo.json',
         proxy: `http://groups-RESIDENTIAL,session-${sessionKey},country-${countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
         json: true,
@@ -141,6 +142,7 @@ const refreshExistingSession = async (input, sessionKey, sessionInfo) => {
         statsInc('refreshesTotal');
 
         const opts = {
+            // NOTE: Using HTTP instead of HTTPS because it consumes less residential traffic!
             url: 'http://api.apify.com/v2/browser-info?skipHeaders=1',
             proxy: `http://groups-RESIDENTIAL,session-${sessionKey},country-${input.countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
             json: true,
