@@ -44,7 +44,7 @@ const probeSession = async (sessionKey, countryCode) => {
     await randomSleep();
 
     const opts = {
-        url: 'https://tools.keycdn.com/geo.json',
+        url: 'http://tools.keycdn.com/geo.json',
         proxy: `http://groups-RESIDENTIAL,session-${sessionKey},country-${countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
         json: true,
         gzip: true,
@@ -141,7 +141,7 @@ const refreshExistingSession = async (input, sessionKey, sessionInfo) => {
         statsInc('refreshesTotal');
 
         const opts = {
-            url: 'https://api.apify.com/v2/browser-info?skipHeaders=1',
+            url: 'http://api.apify.com/v2/browser-info?skipHeaders=1',
             proxy: `http://groups-RESIDENTIAL,session-${sessionKey},country-${input.countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
             json: true,
             gzip: true,
