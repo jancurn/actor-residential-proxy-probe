@@ -161,7 +161,7 @@ const refreshExistingSession = async (input, sessionKey, sessionInfo) => {
 
 
 const heartbeat = ({ input }) => {
-    const regionToProxyCount = {};
+    const regionToSessionCount = {};
 
     // First, iterate existing sessions and refresh them in background (send keep alive and validate IP is the same)
     for (let [sessionKey, sessionInfo] of Object.entries(state.proxySessions)) {
@@ -170,7 +170,7 @@ const heartbeat = ({ input }) => {
         // If session is not too old, consider it for region matching
         if (moment().diff(sessionInfo.lastCheckedAt, 'milliseconds') < MAX_SESSION_AGE_MILLIS) {
             const region = input.dmaCodes ? sessionInfo.dmaCode : sessionInfo.postalCode;
-            const newCount = (regionToProxyCount[region] || 0) + 1;
+            const newCount = (regionToSessionCount[region] || 0) + 1;
 
             if (input.maxSessionsPerRegion && newCount > input.maxSessionsPerRegion) {
                 console.log(`Session ${sessionKey}: Exceeded max session per region (${region}), will be forgotten `);
@@ -179,7 +179,7 @@ const heartbeat = ({ input }) => {
                 continue;
             }
 
-            regionToProxyCount[region] = newCount;
+            regionToSessionCount[region] = newCount;
         }
     }
 
@@ -190,8 +190,8 @@ const heartbeat = ({ input }) => {
     let minRegion;
     let maxRegion;
     for (let region of regions) {
-        if (!regionToProxyCount[region]) regionToProxyCount[region] = 0;
-        const count = regionToProxyCount[region];
+        if (!regionToSessionCount[region]) regionToSessionCount[region] = 0;
+        const count = regionToSessionCount[region];
 
         if (count < minPerRegion) {
             minPerRegion = count;
@@ -208,7 +208,7 @@ const heartbeat = ({ input }) => {
     const totalSessions = Object.keys(state.proxySessions).length;
 
     console.log(`Heartbeat: live sessions: ${totalSessions} of ${input.maxSessions}, minPerRegion: ${minPerRegion} (e.g. ${minRegion}), maxPerRegion: ${maxPerRegion} (e.g. ${maxRegion}), regionsCount: ${regions.length}`);
-    console.log(`Session count per region: ${JSON.stringify(regionToProxyCount)}`);
+    state.regionToSessionCount = regionToSessionCount;
 
     if (totalSessions < input.maxSessions && minPerRegion < input.minSessionsPerRegion) {
         console.log(`Probing ${NEW_SESSIONS_PER_HEARTBEAT} new sessions`);
@@ -244,6 +244,7 @@ Apify.main(async () => {
         state = {
             stats: {},
             proxySessions: {},
+            regionToSessionCount: null,
         };
     }
 
