@@ -6,10 +6,11 @@ const usZipCodeToDma = require('./us_zip_code_to_dma');
 
 const { log } = Apify.utils;
 
+// TODO: Make some of these input
 const HEARTBEAT_INTERVAL_MILLIS = 20 * 1000;
 const STORE_STATE_INTERVAL_MILLIS = 10 * 1000;
 const MAX_SESSION_AGE_MILLIS = 50 * 1000;
-const NEW_SESSIONS_PER_HEARTBEAT = 30;
+const NEW_SESSIONS_PER_HEARTBEAT_PERCENT = 0.04;
 const RANDOM_WAIT_BEFORE_REQUESTS_MILLIS = 10 * 1000;
 
 // Global state, which is periodically stored into the key-value store
@@ -223,8 +224,9 @@ const heartbeat = ({ input }) => {
     state.regionToSessionCount = regionToSessionCount;
 
     if (totalSessions < input.maxSessions && minPerRegion < input.minSessionsPerRegion) {
-        console.log(`Probing ${NEW_SESSIONS_PER_HEARTBEAT} new sessions`);
-        for (let i = 0; i < NEW_SESSIONS_PER_HEARTBEAT; i++) {
+        const newCount = Math.ceil(input.maxSessions * NEW_SESSIONS_PER_HEARTBEAT_PERCENT);
+        console.log(`Probing ${newCount} new sessions`);
+        for (let i = 0; i < newCount; i++) {
             addNewSession(input).catch(fatalError);
         }
     }
