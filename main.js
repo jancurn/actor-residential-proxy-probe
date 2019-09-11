@@ -190,7 +190,8 @@ const heartbeat = ({ input }) => {
     let minRegion;
     let maxRegion;
     for (let region of regions) {
-        const count = regionToProxyCount[region] || 0;
+        if (!regionToProxyCount[region]) regionToProxyCount[region] = 0;
+        const count = regionToProxyCount[region];
 
         if (count < minPerRegion) {
             minPerRegion = count;
@@ -207,6 +208,7 @@ const heartbeat = ({ input }) => {
     const totalSessions = Object.keys(state.proxySessions).length;
 
     console.log(`Heartbeat: live sessions: ${totalSessions} of ${input.maxSessions}, minPerRegion: ${minPerRegion} (e.g. ${minRegion}), maxPerRegion: ${maxPerRegion} (e.g. ${maxRegion}), regionsCount: ${regions.length}`);
+    console.log(`Session count per region: ${JSON.stringify(regionToProxyCount)}`);
 
     if (totalSessions < input.maxSessions && minPerRegion < input.minSessionsPerRegion) {
         console.log(`Probing ${NEW_SESSIONS_PER_HEARTBEAT} new sessions`);
