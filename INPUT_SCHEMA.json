@@ -547,9 +547,6 @@
   },
   "required": [
     "countryCode",
-    "maxSessions",
-    "minSessionsPerRegion",
-    "maxSessionsPerRegion",
     "recordKey"
   ]
 }
