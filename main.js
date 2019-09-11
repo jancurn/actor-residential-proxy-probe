@@ -10,6 +10,7 @@ const HEARTBEAT_INTERVAL_MILLIS = 20 * 1000;
 const STORE_STATE_INTERVAL_MILLIS = 10 * 1000;
 const MAX_SESSION_AGE_MILLIS = 50 * 1000;
 const NEW_SESSIONS_PER_HEARTBEAT = 30;
+const RANDOM_WAIT_BEFORE_REQUESTS_MILLIS = 10 * 1000;
 
 // Global state, which is periodically stored into the key-value store
 let state;
@@ -33,8 +34,15 @@ const fatalError = (err) => {
     process.exit(1);
 };
 
+// This is to spread HTTP requests over longer
+const randomSleep = async () => {
+    await Apify.utils.sleep(Math.random() * RANDOM_WAIT_BEFORE_REQUESTS_MILLIS);
+};
+
 // TODO: We should have some fallback API for case keycdn.com is down...
 const probeSession = async (sessionKey, countryCode) => {
+    await randomSleep();
+
     const opts = {
         url: 'https://tools.keycdn.com/geo.json',
         proxy: `http://groups-RESIDENTIAL,session-${sessionKey},country-${countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
@@ -128,6 +136,8 @@ const refreshExistingSession = async (input, sessionKey, sessionInfo) => {
     let ipAddress;
 
     try {
+        await randomSleep();
+
         statsInc('refreshesTotal');
 
         const opts = {
