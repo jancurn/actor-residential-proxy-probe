@@ -78,7 +78,7 @@ const addNewSession = async (input) => {
         return;
     }
 
-    sessionInfo.dmaCode = input.countryCode === 'US' && usZipCodeToDma[sessionInfo.postalCode]
+    sessionInfo.dmaCode = input.countryCode.toLowerCase() === 'us' && usZipCodeToDma[sessionInfo.postalCode]
         ? usZipCodeToDma[sessionInfo.postalCode]
         : null;
     sessionInfo.foundAt = new Date();
