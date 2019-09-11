@@ -10,6 +10,8 @@ If yes, the actor saves the session key and then performs periodic requests
 on that session to keep it alive.
 Therefore, the actor needs to run infinitely or as long as you need the proxies.
 
+Yes, this actor is a hack.
+
 The pool of residential proxy session is periodically stored as a JSON
 record into a Key-value store (either to a named or an anonymous one),
 including various statistics. The file looks as follows:
