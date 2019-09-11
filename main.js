@@ -231,6 +231,9 @@ Apify.main(async () => {
     if ((!input.dmaCodes || !input.dmaCodes.length) && (!input.postalCodes || !input.postalCodes.length)) {
         throw new Error('Either "dmaCodes" or "postalCodes" input field must contain some values!');
     }
+    if (input.dmaCodes && input.postalCodes) {
+        throw new Error('Cannot specify both "dmaCodes" or "postalCodes" together!');
+    }
 
     const keyValueStore = await Apify.openKeyValueStore(input.keyValueStoreName);
 
