@@ -89,7 +89,7 @@ const addNewSession = async (input) => {
     // If DMA or postal code is not in the requested set, forget the session and update stats
     if (input.dmaCodes) {
         if (!sessionInfo.dmaCode) {
-            console.log(`Session ${sessionKey}: DMA code not found`);
+            console.log(`Session ${sessionKey}: DMA code not found ${JSON.stringify(_.pick(sessionInfo, 'ipAddress', 'regionName', 'city', 'postalCode'))}`);
             delete state.proxySessions[sessionKey];
             statsInc('probesDmaNotFound');
             return;
@@ -160,7 +160,7 @@ const refreshExistingSession = async (input, sessionKey, sessionInfo) => {
 };
 
 
-const heartbeat = ({ input, keyValueStore }) => {
+const heartbeat = ({ input }) => {
     const regionToProxyCount = {};
 
     // First, iterate existing sessions and refresh them in background (send keep alive and validate IP is the same)
@@ -245,9 +245,9 @@ Apify.main(async () => {
         };
     }
 
-    heartbeat({ input, keyValueStore });
+    heartbeat({ input });
     setInterval(() => {
-        heartbeat({ input, keyValueStore });
+        heartbeat({ input });
     }, HEARTBEAT_INTERVAL_MILLIS);
 
     // Store state in a more frequent interval
