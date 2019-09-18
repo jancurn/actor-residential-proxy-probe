@@ -10,7 +10,6 @@ const { log } = Apify.utils;
 const HEARTBEAT_INTERVAL_MILLIS = 20 * 1000;
 const STORE_STATE_INTERVAL_MILLIS = 10 * 1000;
 const MAX_SESSION_AGE_MILLIS = 50 * 1000;
-const NEW_SESSIONS_PER_HEARTBEAT_PERCENT = 0.04;
 const RANDOM_WAIT_BEFORE_REQUESTS_MILLIS = 10 * 1000;
 
 // Global state, which is periodically stored into the key-value store
@@ -202,9 +201,14 @@ const heartbeat = ({ input }) => {
     let maxPerRegion = Number.NEGATIVE_INFINITY;
     let minRegion;
     let maxRegion;
+    let missingSessions = 0;
     for (let region of regions) {
         if (!regionToSessionCount[region]) regionToSessionCount[region] = 0;
         const count = regionToSessionCount[region];
+
+        if (count < input.minSessionsPerRegion) {
+            missingSessions += input.minSessionsPerRegion - count;
+        }
 
         if (count < minPerRegion) {
             minPerRegion = count;
@@ -220,11 +224,11 @@ const heartbeat = ({ input }) => {
 
     const totalSessions = Object.keys(state.proxySessions).length;
 
-    console.log(`Heartbeat: live sessions: ${totalSessions} of ${input.maxSessions}, minPerRegion: ${minPerRegion} (e.g. ${minRegion}), maxPerRegion: ${maxPerRegion} (e.g. ${maxRegion}), regionsCount: ${regions.length}`);
+    console.log(`Heartbeat: sessions: ${totalSessions} (${missingSessions} missing), minPerRegion: ${minPerRegion} (e.g. ${minRegion}), maxPerRegion: ${maxPerRegion} (e.g. ${maxRegion}), regionsCount: ${regions.length}`);
     state.regionToSessionCount = regionToSessionCount;
 
-    if (totalSessions < input.maxSessions && minPerRegion < input.minSessionsPerRegion) {
-        const newCount = Math.ceil(input.maxSessions * NEW_SESSIONS_PER_HEARTBEAT_PERCENT);
+    if (missingSessions > 0) {
+        const newCount = Math.ceil(input.newSessionsPerHeartbeat);
         console.log(`Probing ${newCount} new sessions`);
         for (let i = 0; i < newCount; i++) {
             addNewSession(input).catch(fatalError);

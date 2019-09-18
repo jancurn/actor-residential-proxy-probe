@@ -507,14 +507,6 @@
       "prefill": "524 602",
       "editor": "textarea"
     },
-    "maxSessions": {
-      "title": "Max sessions",
-      "type": "integer",
-      "description": "Maximum number of residential proxy sessions to maintain and keep alive. The higher the value, the more residential proxy traffic the actor will consume!",
-      "minimum": 1,
-      "maximum": 9999,
-      "default": 100
-    },
     "minSessionsPerRegion": {
       "title": "Min sessions per region",
       "type": "integer",
@@ -531,16 +523,24 @@
       "maximum": 100,
       "default": 5
     },
+    "newSessionsPerHeartbeat": {
+      "title": "New sessions per heartbeat",
+      "type": "integer",
+      "description": "If there are not enough session per region to meet the <b>minSessionsPerRegion</b> criteria, we're adding new session in every heartbeat (i.e. every 20 seconds). The higher the value, the more residential proxy traffic the actor will consume, but the faster it will find enough matching sessions.",
+      "minimum": 1,
+      "maximum": 100,
+      "default": 20
+    },
     "keyValueStoreName": {
       "title": "Key-value store name",
       "type": "string",
-      "description": "Maximum number of residential proxy sessions to maintain and keep alive for a single postal code or DMA (whichever is specified). The higher the value, the more residential proxy traffic the actor will consume!",
+      "description": "Name of the Key-value store where to store the JSON file with the state. If empty, the actor stores data to the default key-value store associated with the actor run.",
       "editor": "textfield"
     },
     "recordKey": {
-      "title": "Key-value store name",
+      "title": "Key-value record name",
       "type": "string",
-      "description": "Maximum number of residential proxy sessions to maintain and keep alive for a single postal code or DMA (whichever is specified). The higher the value, the more residential proxy traffic the actor will consume!",
+      "description": "The name of the record in the key-value store where the JSON file with the state is stored.",
       "editor": "textfield",
       "default": "RESIDENTIAL_PROXY_SESSION_POOL"
     }
