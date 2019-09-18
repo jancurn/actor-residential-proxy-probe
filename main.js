@@ -177,8 +177,6 @@ const heartbeat = ({ input }) => {
 
     // First, iterate existing sessions and refresh them in background (send keep alive and validate IP is the same)
     for (let [sessionKey, sessionInfo] of Object.entries(state.proxySessions)) {
-        refreshExistingSession(input, sessionKey, sessionInfo).catch(fatalError);
-
         // If session is not too old, consider it for region matching
         if (moment().diff(sessionInfo.lastCheckedAt, 'milliseconds') < MAX_SESSION_AGE_MILLIS) {
             const region = input.dmaCodes ? sessionInfo.dmaCode : sessionInfo.postalCode;
@@ -193,6 +191,8 @@ const heartbeat = ({ input }) => {
 
             regionToSessionCount[region] = newCount;
         }
+
+        refreshExistingSession(input, sessionKey, sessionInfo).catch(fatalError);
     }
 
     // Check how many live sessions we have per region, and if not enough, then launch new ones
