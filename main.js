@@ -177,8 +177,18 @@ const heartbeat = ({ input }) => {
 
     // First, iterate existing sessions and refresh them in background (send keep alive and validate IP is the same)
     for (let [sessionKey, sessionInfo] of Object.entries(state.proxySessions)) {
+        const ageMillis = moment().diff(sessionInfo.lastCheckedAt, 'milliseconds');
+
         // If session is not too old, consider it for region matching
-        if (moment().diff(sessionInfo.lastCheckedAt, 'milliseconds') < MAX_SESSION_AGE_MILLIS) {
+        if (ageMillis > 2 * MAX_SESSION_AGE_MILLIS) {
+            console.log(`Session ${sessionKey}: Expired, will be forgotten`);
+            delete state.proxySessions[sessionKey];
+            statsInc('expired');
+            continue;
+        }
+
+        // If session is not too old, consider it for region matching
+        if (ageMillis < MAX_SESSION_AGE_MILLIS) {
             const region = input.dmaCodes ? sessionInfo.dmaCode : sessionInfo.postalCode;
             const newCount = (regionToSessionCount[region] || 0) + 1;
 
