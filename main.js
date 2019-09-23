@@ -52,7 +52,7 @@ const probeSession = async (sessionKey, countryCode) => {
     };
     const json = await request(opts);
 
-    if (!json || !json.data || !json.data.geo || !json.data.geo.ip) throw new Error('Invalid response');
+    if (!json || !json.data || !json.data.geo || !json.data.geo.ip) throw new Error('Unexpected response body');
     const { geo } = json.data;
 
     return {
