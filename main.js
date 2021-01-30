@@ -45,22 +45,21 @@ const probeSession = async (sessionKey, countryCode) => {
 
     const opts = {
         // NOTE: Using HTTP instead of HTTPS because it consumes less residential traffic!
-        url: 'http://tools.keycdn.com/geo.json',
+        url: 'http://ip-api.com/json?fields=countryCode,regionName,city,zip,query',
         proxy: `http://groups-RESIDENTIAL,session-${sessionKey},country-${countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
         json: true,
         gzip: true,
     };
     const json = await request(opts);
 
-    if (!json || !json.data || !json.data.geo || !json.data.geo.ip) throw new Error('Unexpected response body');
-    const { geo } = json.data;
+    if (!json || !json.query) throw new Error('Unexpected response body');
 
     return {
-        ipAddress: geo.ip,
-        countryCode: geo.country_code,
-        regionName: geo.region_name,
-        city: geo.city,
-        postalCode: geo.postal_code,
+        ipAddress: json.query,
+        countryCode: json.countryCode,
+        regionName: json.regionName,
+        city: json.city,
+        postalCode: json.zip,
     };
 };
 
