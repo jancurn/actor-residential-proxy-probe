@@ -6,7 +6,7 @@
 		"apify": "^0.15.2",
 		"moment": "^2.24.0",
 		"request-promise": "^4.2.4",
-		"underscore": "^1.9.1"
+		"underscore": "^1.12.1"
 	},
 	"devDependencies": {},
 	"scripts": {
