@@ -3,12 +3,11 @@
 	"version": "0.0.1",
 	"description": "This is a boilerplate of an Apify actor.",
 	"dependencies": {
-		"apify": "^0.15.2",
-		"moment": "^2.24.0",
-		"request-promise": "^4.2.4",
-		"underscore": "^1.9.1"
+		"apify": "^2.0.1",
+		"got-scraping": "^2.1.2",
+		"moment": "^2.29.1",
+		"underscore": "^1.13.1"
 	},
-	"devDependencies": {},
 	"scripts": {
 		"start": "node main.js",
 		"test": "echo \"Error: oops, the actor has no tests yet, sad!\" && exit 1"

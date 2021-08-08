@@ -1,10 +1,10 @@
 const _ = require('underscore');
 const Apify = require('apify');
-const request = require('request-promise');
+const request = require('got-scraping');
 const moment = require('moment');
 const usZipCodeToDma = require('./us_zip_code_to_dma');
 
-const { log } = Apify.utils;
+const { utils: { log, sleep } } = Apify;
 
 // TODO: Make some of these input
 const HEARTBEAT_INTERVAL_MILLIS = 20 * 1000;
@@ -36,21 +36,22 @@ const fatalError = (err) => {
 
 // This is to spread HTTP requests over longer
 const randomSleep = async () => {
-    await Apify.utils.sleep(Math.random() * RANDOM_WAIT_BEFORE_REQUESTS_MILLIS);
+    await sleep(Math.random() * RANDOM_WAIT_BEFORE_REQUESTS_MILLIS);
 };
 
-// TODO: We should have some fallback API for case keycdn.com is down...
 const probeSession = async (sessionKey, countryCode) => {
     await randomSleep();
 
     const opts = {
         // NOTE: Using HTTP instead of HTTPS because it consumes less residential traffic!
         url: 'http://ip-api.com/json?fields=countryCode,regionName,city,zip,query',
-        proxy: `http://groups-RESIDENTIAL,session-${sessionKey},country-${countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-        json: true,
-        gzip: true,
+        proxyUrl: `http://groups-RESIDENTIAL,session-${sessionKey},country-${countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+        responseType: 'json',
+        http2: false,
+        decompress: true,
+        useHeaderGenerator: false,
     };
-    const json = await request(opts);
+    const { body: json } = await request(opts);
 
     if (!json || !json.query) throw new Error('Unexpected response body');
 
@@ -141,13 +142,14 @@ const refreshExistingSession = async (input, sessionKey, sessionInfo) => {
         statsInc('refreshesTotal');
 
         const opts = {
-            // NOTE: Using HTTP instead of HTTPS because it consumes less residential traffic!
-            url: 'http://api.apify.com/v2/browser-info?skipHeaders=1',
-            proxy: `http://groups-RESIDENTIAL,session-${sessionKey},country-${input.countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
-            json: true,
-            gzip: true,
+            url: 'https://api.apify.com/v2/browser-info?skipHeaders=1',
+            proxyUrl: `http://groups-RESIDENTIAL,session-${sessionKey},country-${input.countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
+            responseType: 'json',
+            http2: false,
+            decompress: true,
+            useHeaderGenerator: false,
         };
-        const result = await request(opts);
+        const { body: result } = await request(opts);
         if (!result || !result.clientIp) throw new Error('Invalid response from Apify API');
 
         ipAddress = result.clientIp;
