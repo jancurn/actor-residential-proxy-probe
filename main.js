@@ -1,10 +1,9 @@
 const _ = require('underscore');
 const Apify = require('apify');
-const request = require('got-scraping');
 const moment = require('moment');
 const usZipCodeToDma = require('./us_zip_code_to_dma');
 
-const { utils: { log, sleep } } = Apify;
+const { utils: { log, sleep, requestAsBrowser: request } } = Apify;
 
 // TODO: Make some of these input
 const HEARTBEAT_INTERVAL_MILLIS = 20 * 1000;
@@ -48,7 +47,6 @@ const probeSession = async (sessionKey, countryCode) => {
         proxyUrl: `http://groups-RESIDENTIAL,session-${sessionKey},country-${countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
         responseType: 'json',
         http2: false,
-        decompress: true,
         useHeaderGenerator: false,
     };
     const { body: json } = await request(opts);
@@ -146,7 +144,6 @@ const refreshExistingSession = async (input, sessionKey, sessionInfo) => {
             proxyUrl: `http://groups-RESIDENTIAL,session-${sessionKey},country-${input.countryCode}:${process.env.APIFY_PROXY_PASSWORD}@proxy.apify.com:8000`,
             responseType: 'json',
             http2: false,
-            decompress: true,
             useHeaderGenerator: false,
         };
         const { body: result } = await request(opts);

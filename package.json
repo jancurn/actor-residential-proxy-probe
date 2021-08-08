@@ -4,7 +4,6 @@
 	"description": "This is a boilerplate of an Apify actor.",
 	"dependencies": {
 		"apify": "^2.0.1",
-		"got-scraping": "^2.1.2",
 		"moment": "^2.29.1",
 		"underscore": "^1.13.1"
 	},
